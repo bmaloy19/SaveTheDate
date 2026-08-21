@@ -48,9 +48,13 @@
     // the keyframes are switched off
     cue.style.animation = 'none';
 
-    // they've engaged — safe to start fetching video metadata now,
-    // so the play tap can hand off to fullscreen without a stall
+    // They've engaged, so start fetching video metadata now. This matters on
+    // iOS: webkitEnterFullscreen is only accepted inside the user gesture AND
+    // once metadata exists, so having it ready by the time they tap play keeps
+    // the handoff on the synchronous path. load() rather than just setting
+    // preload, because Safari won't always act on the attribute change alone.
     video.preload = 'metadata';
+    try { video.load(); } catch (e) { /* non-fatal */ }
 
     if (reduced || !window.gsap) { finish(true); return; }
 
