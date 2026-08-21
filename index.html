@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>McKenna &amp; Jared — Save the Date</title>
+
+<meta name="description" content="McKenna &amp; Jared are getting married. May 29, 2027 — Willow on Grand, Des Moines, Iowa.">
+<meta name="theme-color" content="#efe8e0">
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Link preview (iMessage / WhatsApp / Facebook) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="McKenna &amp; Jared — Save the Date">
+<meta property="og:description" content="We're getting married! May 29, 2027 · Des Moines, Iowa">
+<meta property="og:image" content="https://bmaloy19.github.io/SaveTheDate/assets/img/poster.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:url" content="https://bmaloy19.github.io/SaveTheDate/">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+<!-- Self-hosted fonts: no third-party connection, no render-blocking round trip -->
+<link rel="preload" href="assets/fonts/bodoni-moda-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/open-sans-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/img/poster-960.jpg">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<main class="stage" id="stage">
+
+  <!-- ─────────────  ENVELOPE  ───────────── -->
+  <section class="scene" id="scene" aria-label="Save the date invitation">
+
+    <div class="envelope" id="envelope">
+
+      <!-- back panel -->
+      <div class="env-back" aria-hidden="true"></div>
+
+      <!-- the flap, seen from inside once it swings open -->
+      <div class="env-lining" aria-hidden="true"></div>
+
+      <!-- the card that slides out -->
+      <div class="card-slot" id="cardSlot">
+        <article class="card" id="card">
+          <div class="card-inner">
+
+            <p class="eyebrow">Save the Date</p>
+
+            <h1 class="names">McKenna<span class="amp">&amp;</span>Jared</h1>
+
+            <div class="rule" aria-hidden="true"><span></span></div>
+
+            <p class="date">
+              <span class="date-day">Saturday</span>
+              <span class="date-main">May 29, 2027</span>
+            </p>
+
+            <!-- video -->
+            <div class="film" id="film">
+              <button class="film-btn" id="playBtn" type="button"
+                      aria-label="Play our save the date video">
+                <img class="film-poster" src="assets/img/poster-960.jpg"
+                     srcset="assets/img/poster-960.jpg 960w, assets/img/poster.jpg 1280w"
+                     sizes="(max-width: 520px) 88vw, 420px"
+                     alt="McKenna and Jared running through a field at sunset"
+                     width="960" height="540" decoding="async">
+                <span class="film-scrim" aria-hidden="true"></span>
+                <span class="film-play" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                    <path d="M8 5.14v13.72a.5.5 0 0 0 .77.42l10.5-6.86a.5.5 0 0 0 0-.84L8.77 4.72a.5.5 0 0 0-.77.42Z"/>
+                  </svg>
+                </span>
+                <span class="film-label" aria-hidden="true">Watch our film</span>
+              </button>
+
+              <video id="video" class="film-video" playsinline preload="none"
+                     poster="assets/img/poster-960.jpg" controls
+                     width="1280" height="720"></video>
+            </div>
+
+            <p class="venue">
+              Willow on Grand<br>
+              <span>Des Moines, Iowa</span>
+            </p>
+
+            <div class="actions">
+              <a class="btn btn-primary" id="calBtn" href="assets/mckenna-jared-wedding.ics"
+                 download="McKenna-and-Jared-Wedding.ics">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none"
+                     stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="16" rx="2"/>
+                  <path d="M3 10h18M8 3v4M16 3v4"/>
+                </svg>
+                Add to calendar
+              </a>
+              <a class="btn btn-ghost" href="https://www.appycouple.com/wedding/mckennajared/welcome/"
+                 target="_blank" rel="noopener noreferrer">
+                Wedding site
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none"
+                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                     stroke-linejoin="round" aria-hidden="true">
+                  <path d="M7 17 17 7M9 7h8v8"/>
+                </svg>
+              </a>
+            </div>
+
+            <p class="footnote">Formal invitation to follow</p>
+
+          </div>
+        </article>
+      </div>
+
+      <!-- front pocket, sits in front of the card -->
+      <div class="env-front" aria-hidden="true"></div>
+
+      <!-- flap that opens -->
+      <div class="env-flap" id="flap" aria-hidden="true"></div>
+
+      <!-- seal / tap target -->
+      <button class="seal" id="seal" type="button" aria-label="Open the envelope">
+        <span class="seal-face">
+          <span class="seal-mono">M<i>&amp;</i>J</span>
+        </span>
+      </button>
+
+    </div>
+
+    <p class="cue" id="cue" aria-hidden="true">Tap to open</p>
+
+  </section>
+
+</main>
+
+<script src="assets/js/gsap.min.js" defer></script>
+<script src="assets/js/app.js" defer></script>
+</body>
+</html>

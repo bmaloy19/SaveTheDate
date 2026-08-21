@@ -1,0 +1,43 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//McKenna and Jared//Save the Date//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VTIMEZONE
+TZID:America/Chicago
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+TZNAME:CDT
+DTSTART:19700308T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+TZNAME:CST
+DTSTART:19701101T020000
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:mckenna-jared-wedding-20270529@bmaloy19.github.io
+DTSTAMP:20260821T000000Z
+DTSTART;TZID=America/Chicago:20270529T170000
+DTEND;TZID=America/Chicago:20270529T230000
+SUMMARY:McKenna & Jared's Wedding
+LOCATION:Willow on Grand\, 6011 Grand Avenue\, Des Moines\, IA 50312
+DESCRIPTION:Save the date! McKenna & Jared are getting married.\n\nRecepti
+ on at Willow on Grand\, Des Moines\, Iowa.\n\nDetails and updates: https:/
+ /www.appycouple.com/wedding/mckennajared/welcome/\n\nFormal invitation to 
+ follow.
+URL:https://www.appycouple.com/wedding/mckennajared/welcome/
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+TRIGGER:-P7D
+ACTION:DISPLAY
+DESCRIPTION:McKenna & Jared's wedding is next week!
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,513 @@
+/* ============================================================
+   McKenna & Jared — Save the Date
+   Palette + type lifted from the couple's Appy Couple site:
+   Bauer Bodoni -> Bodoni Moda, Open Sans Light, sand #d7c2a3
+   ============================================================ */
+
+@font-face{
+  font-family:'Bodoni Moda';font-style:normal;font-weight:400;font-display:swap;
+  src:url('../fonts/bodoni-moda-400-normal.woff2') format('woff2');
+}
+@font-face{
+  font-family:'Bodoni Moda';font-style:italic;font-weight:400;font-display:swap;
+  src:url('../fonts/bodoni-moda-400-italic.woff2') format('woff2');
+}
+@font-face{
+  font-family:'Open Sans';font-style:normal;font-weight:300;font-display:swap;
+  src:url('../fonts/open-sans-300-normal.woff2') format('woff2');
+}
+@font-face{
+  font-family:'Open Sans';font-style:normal;font-weight:400;font-display:swap;
+  src:url('../fonts/open-sans-400-normal.woff2') format('woff2');
+}
+
+:root{
+  --sand:        #d7c2a3;
+  --sand-mid:    #c9b08b;
+  --sand-deep:   #9c8259;
+  --sand-shade:  #bda078;
+  --cream:       #efe8e0;
+  --cream-2:     #e8e0d7;
+  --paper:       #fdfbf8;
+  --ink:         #454545;
+  --ink-soft:    #83796c;
+  --rose:        #e24e6a;
+
+  --serif: 'Bodoni Moda', 'Didot', 'Bodoni MT', Georgia, serif;
+  --sans:  'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --env-w: min(92vw, 390px);
+  --env-h: calc(var(--env-w) * 0.70);
+  --card-w: min(88vw, 384px);
+
+  --ease-out: cubic-bezier(.16,.84,.34,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html,body{height:100%}
+
+body{
+  font-family:var(--sans);
+  font-weight:300;
+  color:var(--ink);
+  background:
+    radial-gradient(120% 90% at 50% 8%, #f6f1ea 0%, var(--cream) 46%, var(--cream-2) 100%);
+  min-height:100svh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+
+/* faint paper tooth over the whole page */
+.grain{
+  position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+
+/* ─────────────────────────  stage  ───────────────────────── */
+
+/* flex + auto margins centres without ever clipping tall content,
+   which grid's place-items:center will do on short viewports */
+.stage{
+  position:relative;
+  min-height:100svh;
+  display:flex;
+  padding:max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+}
+.stage > *{margin:auto}
+
+.scene{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* ───────────────────────  envelope  ─────────────────────── */
+
+/* perspective lives on the envelope itself (not preserve-3d) so the flap
+   still rotates in 3D while every panel keeps ordinary z-index stacking */
+.envelope{
+  position:relative;
+  width:var(--env-w);
+  height:var(--env-h);
+  perspective:1400px;
+  perspective-origin:50% 30%;
+  will-change:transform,opacity;
+}
+
+/* soft cast shadow under the envelope */
+.envelope::after{
+  content:'';
+  position:absolute;left:6%;right:6%;bottom:-13px;height:26px;
+  background:radial-gradient(50% 50% at 50% 50%, rgba(105,84,58,.28), transparent 72%);
+  filter:blur(7px);
+  z-index:0;
+}
+
+.env-back{
+  position:absolute;inset:0;
+  background:linear-gradient(168deg, #e0cdb1 0%, #cbb492 100%);
+  border-radius:4px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34);
+  z-index:1;
+}
+
+/* the pale inner lining you see once the flap is up */
+.env-lining{
+  position:absolute;left:0;right:0;top:0;
+  height:62%;
+  background:linear-gradient(180deg,#f3ece2 0%,#e7dccb 100%);
+  clip-path:polygon(0 0, 100% 0, 50% 100%);
+  border-radius:4px 4px 0 0;
+  z-index:2;
+  opacity:0;
+}
+
+/* front pocket — overlaps the card so it reads as "tucked in" */
+.env-front{
+  position:absolute;inset:0;
+  background:linear-gradient(172deg, #e4d3ba 0%, #d2bc9b 60%, #c2a980 100%);
+  border-radius:4px;
+  z-index:6;
+  clip-path:polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+  box-shadow:0 -1px 0 rgba(255,255,255,.18) inset;
+}
+/* crisp seam where the two front folds meet */
+.env-front::before{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - .5px), rgba(255,255,255,.30) 50%, transparent calc(50% + .5px)),
+    linear-gradient(to bottom left,  transparent calc(50% - .5px), rgba(255,255,255,.30) 50%, transparent calc(50% + .5px));
+  clip-path:polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+}
+
+/* the flap */
+.env-flap{
+  position:absolute;left:0;right:0;top:0;
+  height:62%;
+  background:linear-gradient(178deg, #e6d6be 0%, #d0ba99 90%);
+  clip-path:polygon(0 0, 100% 0, 50% 100%);
+  transform-origin:top center;
+  transform:rotateX(0deg);
+  backface-visibility:visible;   /* we see the outer side once it flips over */
+  border-radius:4px 4px 0 0;
+  z-index:8;
+  will-change:transform;
+}
+.env-flap::after{ /* fold shading along the crease */
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(120,96,66,.16) 0%, transparent 26%);
+  clip-path:polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* seal */
+.seal{
+  position:absolute;
+  left:50%;top:58%;
+  width:clamp(52px,14%,64px);aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  z-index:9;
+  border:0;padding:0;
+  background:none;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.seal-face{
+  position:absolute;inset:0;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:radial-gradient(68% 68% at 34% 28%, #fbf7f1 0%, var(--cream) 42%, #ddd0bd 100%);
+  box-shadow:
+    0 2px 7px rgba(94,74,50,.30),
+    inset 0 0 0 1px rgba(156,130,89,.42),
+    inset 0 0 0 4px rgba(255,255,255,.55),
+    inset 0 0 0 5px rgba(156,130,89,.22);
+  transition:transform .35s var(--ease-out), box-shadow .35s var(--ease-out);
+}
+.seal:hover .seal-face{transform:scale(1.045)}
+.seal:focus-visible .seal-face{outline:2px solid var(--sand-deep);outline-offset:4px}
+.seal-mono{
+  font-family:var(--serif);
+  font-size:clamp(13px,3.2vw,15px);
+  letter-spacing:.06em;
+  color:var(--sand-deep);
+  line-height:1;
+  padding-left:.06em;
+}
+.seal-mono i{font-style:italic;opacity:.72;margin:0 .04em}
+
+/* "tap to open" cue */
+.cue{
+  margin-top:34px;
+  font-size:10.5px;
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  color:var(--sand-deep);
+  opacity:.85;
+  animation:breathe 2.9s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{opacity:.42;transform:translateY(0)}
+  50%    {opacity:.95;transform:translateY(-2px)}
+}
+
+/* ─────────────────────────  card  ───────────────────────── */
+
+.card-slot{
+  position:absolute;
+  left:50%;
+  bottom:10%;
+  width:var(--card-w);
+  /* conservative default; app.js measures and refines it on load */
+  transform:translateX(-50%) scale(.30);
+  transform-origin:50% 100%;
+  z-index:4;              /* between back(1) and front(6) */
+  will-change:transform;
+  pointer-events:none;    /* off until it's out of the envelope */
+}
+
+/* once the reveal is done the card is reparented onto the stage and
+   simply centres itself in normal flow */
+.card-slot.is-out{
+  position:static;
+  width:var(--card-w);
+  margin:auto;
+  transform:none;   /* GSAP clears its inline transform back onto this */
+  pointer-events:auto;
+  z-index:20;
+  will-change:auto;
+}
+/* pulled out of flow (not hidden) so the envelope can still fade away
+   while the card measures and settles into its final spot */
+.stage.is-revealed .scene{
+  position:absolute;
+  left:50%;top:50%;
+  margin:0;
+  pointer-events:none;
+}
+
+.card{
+  position:relative;
+  background:
+    linear-gradient(180deg,#fffdfb 0%, var(--paper) 38%, #f8f3ec 100%);
+  border-radius:3px;
+  box-shadow:
+    0 1px 2px rgba(90,72,50,.10),
+    0 10px 26px -8px rgba(90,72,50,.24),
+    0 30px 60px -22px rgba(90,72,50,.30);
+  overflow:hidden;
+}
+/* thin inset rule, echoing the cards on their wedding site */
+.card::before{
+  content:'';position:absolute;inset:9px;
+  border:1px solid rgba(215,194,163,.62);
+  border-radius:1px;
+  pointer-events:none;
+}
+
+.card-inner{
+  padding:clamp(20px,5vw,26px) clamp(19px,5vw,26px) clamp(17px,4.2vw,21px);
+  text-align:center;
+}
+
+.eyebrow{
+  font-size:10px;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  color:var(--sand-deep);
+  margin-bottom:clamp(11px,2.8vw,14px);
+  padding-left:.42em;
+}
+
+.names{
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(26px,7.3vw,34px);
+  line-height:1.06;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--sand);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.02em;
+}
+.names .amp{
+  font-size:.52em;
+  font-style:italic;
+  text-transform:none;
+  color:var(--sand-mid);
+  letter-spacing:0;
+  margin:.06em 0;
+}
+
+.rule{
+  display:flex;align-items:center;justify-content:center;
+  margin:clamp(11px,2.8vw,14px) auto clamp(10px,2.6vw,12px);
+  width:56%;
+}
+/* line — dot — line, with the dot actually in the middle */
+.rule::before,.rule::after{
+  content:'';flex:1;height:1px;
+}
+.rule::before{background:linear-gradient(90deg,transparent,rgba(215,194,163,.95))}
+.rule::after {background:linear-gradient(90deg,rgba(215,194,163,.95),transparent)}
+.rule span{
+  flex:none;
+  width:3.5px;height:3.5px;margin:0 9px;
+  border-radius:50%;
+  background:var(--sand);
+}
+
+.date{
+  font-family:var(--serif);
+  color:var(--ink);
+  line-height:1.34;
+  margin-bottom:clamp(14px,3.6vw,18px);
+}
+.date-day{
+  display:block;
+  font-family:var(--sans);
+  font-size:10px;
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:6px;
+  padding-left:.34em;
+}
+.date-main{
+  display:block;
+  font-size:clamp(19px,5.2vw,23px);
+  letter-spacing:.04em;
+}
+
+/* ─────────────────────────  film  ───────────────────────── */
+
+.film{
+  position:relative;
+  margin:0 0 clamp(14px,3.6vw,18px);
+  border-radius:2px;
+  overflow:hidden;
+  background:#2b2622;
+  aspect-ratio:16/9;
+  box-shadow:0 2px 12px -3px rgba(90,72,50,.32);
+}
+
+.film-btn{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  border:0;padding:0;margin:0;
+  background:none;
+  cursor:pointer;
+  display:block;
+  -webkit-tap-highlight-color:transparent;
+}
+.film-poster{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform .7s var(--ease-out), filter .5s ease;
+}
+.film-scrim{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(38,28,18,.06) 0%, rgba(38,28,18,.30) 62%, rgba(38,28,18,.52) 100%);
+  transition:opacity .4s ease;
+}
+.film-play{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:52px;height:52px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  color:#4a3d2c;
+  background:rgba(253,251,248,.94);
+  box-shadow:0 3px 14px rgba(30,22,14,.34);
+  padding-left:3px;
+  transition:transform .38s var(--ease-out), background .3s ease;
+}
+.film-play svg{display:block}
+.film-label{
+  position:absolute;left:0;right:0;bottom:11px;
+  font-size:9.5px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:rgba(255,252,247,.94);
+  text-shadow:0 1px 5px rgba(0,0,0,.5);
+  padding-left:.3em;
+  transition:opacity .3s ease;
+}
+.film-btn:hover .film-poster{transform:scale(1.045)}
+.film-btn:hover .film-play{transform:translate(-50%,-50%) scale(1.09);background:#fff}
+.film-btn:focus-visible{outline:2px solid var(--sand-deep);outline-offset:3px}
+
+.film-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  background:#2b2622;
+  opacity:0;
+  pointer-events:none;
+}
+.film.is-playing .film-video{opacity:1;pointer-events:auto}
+.film.is-playing .film-btn{opacity:0;pointer-events:none}
+
+/* ────────────────────  venue / actions  ─────────────────── */
+
+.venue{
+  font-family:var(--serif);
+  font-size:clamp(14px,3.7vw,15.5px);
+  line-height:1.55;
+  color:var(--ink);
+  letter-spacing:.02em;
+  margin-bottom:clamp(14px,3.6vw,18px);
+}
+.venue span{
+  font-family:var(--sans);
+  font-size:10px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  display:inline-block;
+  margin-top:5px;
+  padding-left:.28em;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  margin-bottom:clamp(13px,3.2vw,16px);
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex:1;
+  padding:11px 6px;
+  font-family:var(--sans);
+  font-size:9px;
+  white-space:nowrap;
+  font-weight:400;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  text-decoration:none;
+  border-radius:2px;
+  cursor:pointer;
+  transition:background .3s ease, color .3s ease, border-color .3s ease, transform .18s var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.985)}
+.btn svg{flex:none;margin-top:-1px}
+
+.btn-primary{
+  background:var(--sand);
+  color:#4a3d2c;
+  border:1px solid var(--sand);
+}
+.btn-primary:hover{background:var(--sand-mid);border-color:var(--sand-mid)}
+
+.btn-ghost{
+  background:transparent;
+  color:var(--sand-deep);
+  border:1px solid rgba(215,194,163,.85);
+}
+.btn-ghost:hover{background:rgba(215,194,163,.17);border-color:var(--sand)}
+
+.btn:focus-visible{outline:2px solid var(--sand-deep);outline-offset:3px}
+
+.footnote{
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:12px;
+  color:var(--ink-soft);
+  letter-spacing:.03em;
+}
+
+/* ────────────────────  desktop framing  ─────────────────── */
+
+@media (min-width:768px){
+  :root{
+    --env-w:min(62vw, 460px);
+    --card-w:min(52vw, 420px);
+  }
+  .actions{justify-content:center}
+  .btn{max-width:190px;font-size:10px;letter-spacing:.14em;padding:12px 10px}
+}
+
+/* short viewports: keep the whole card on screen */
+@media (max-height:720px){
+  :root{--card-w:min(84vw, 330px)}
+  .card-inner{padding-top:22px;padding-bottom:20px}
+  .film{margin-bottom:16px}
+  .names{font-size:clamp(26px,7.4vw,32px)}
+}
+
+/* ────────────────────  reduced motion  ─────────────────── */
+
+@media (prefers-reduced-motion:reduce){
+  .cue{animation:none;opacity:.8}
+  *{transition-duration:.01ms !important}
+}
