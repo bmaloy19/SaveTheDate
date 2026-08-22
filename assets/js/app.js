@@ -33,6 +33,7 @@
 
   var state = 'front';        // front -> flipping -> back -> opening -> done
   var flapBehind = false;
+  var seatScale  = 1;
 
   /* ── pick a rendition ────────────────────────────────────── */
   var HD = 'assets/video/save-the-date.mp4';
@@ -115,15 +116,31 @@
         }
       }, 0.2)
 
-      // …and the card draws out to the side rather than upward
-      .to(cardSlot, { x: ew * 0.34, duration: 0.9, ease: 'power2.out' }, 0.95);
+      // …and the card draws out to the side rather than upward. Lying on its
+      // side it nearly fills the envelope, so the envelope drifts the other
+      // way to make room — on a phone there is otherwise nowhere to draw to.
+      .to(cardSlot, { x: ew * 0.34, duration: 0.9, ease: 'power2.out' }, 0.95)
+      .to(scene,    { x: -ew * 0.23, duration: 0.9, ease: 'power2.out' }, 0.95);
   }
 
-  /* the card sits scaled down inside the envelope so nothing pokes out */
+  /* The card lies on its side inside the landscape envelope, exactly as a
+     portrait card really sits in one. Rotated 90deg its HEIGHT spans the
+     envelope's width and its WIDTH spans the height, so it has to be fitted
+     against both axes. It stands upright again during the final settle. */
   function seatCard() {
     if (!window.gsap || cardSlot.classList.contains('is-out')) return;
-    var s = Math.min(0.9, (envelope.offsetHeight * 0.80) / card.offsetHeight);
-    gsap.set(cardSlot, { xPercent: -50, x: 0, y: 0, scale: s, transformOrigin: '50% 100%' });
+    seatScale = Math.min(
+      0.9,
+      (envelope.offsetWidth  * 0.86) / card.offsetHeight,
+      (envelope.offsetHeight * 0.82) / card.offsetWidth
+    );
+    gsap.set(cardSlot, {
+      xPercent: -50, yPercent: -50,
+      x: 0, y: 0,
+      rotation: 90,
+      scale: seatScale,
+      transformOrigin: '50% 50%'
+    });
   }
 
   /* ══ beat 3 — hand the card off to its own centred layout ══ */
@@ -149,11 +166,12 @@
     var last = card.getBoundingClientRect();
 
     gsap.set(cardSlot, {
-      xPercent: 0,
-      x: first.left - last.left,
-      y: first.top  - last.top,
-      scale: first.width / last.width,
-      transformOrigin: '0 0'
+      xPercent: 0, yPercent: 0,
+      x: (first.left + first.width  / 2) - (last.left + last.width  / 2),
+      y: (first.top  + first.height / 2) - (last.top  + last.height / 2),
+      rotation: 90,
+      scale: seatScale,
+      transformOrigin: '50% 50%'
     });
 
     gsap.timeline({ onComplete: function () { state = 'done'; } })
@@ -162,8 +180,8 @@
         onComplete: function () { scene.style.display = 'none'; }
       }, 0)
       .to(cardSlot, {
-        x: 0, y: 0, scale: 1,
-        duration: 0.85,
+        x: 0, y: 0, scale: 1, rotation: 0,
+        duration: 1.0,
         ease: 'power3.inOut',
         onComplete: function () { gsap.set(cardSlot, { clearProps: 'transform' }); }
       }, 0)

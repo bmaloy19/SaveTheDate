@@ -39,7 +39,7 @@
 
   --card-w: min(86vw, 370px);
   /* envelope derived from the card so their proportion holds everywhere */
-  --env-w:  min(94vw, calc(var(--card-w) * 1.22));
+  --env-w:  min(88vw, calc(var(--card-w) * 1.22));
   --env-h:  calc(var(--env-w) * 0.68);
 
   --ease-out: cubic-bezier(.16,.84,.34,1);
@@ -362,10 +362,12 @@ body{
 .card-slot{
   position:absolute;
   left:50%;
-  bottom:10%;
+  top:50%;
   width:var(--card-w);
-  transform:translateX(-50%) scale(.30);
-  transform-origin:50% 100%;
+  /* it lies on its side inside the landscape envelope and stands up during
+     the final settle — app.js owns the transform from load */
+  transform:translate(-50%,-50%) rotate(90deg) scale(.28);
+  transform-origin:50% 50%;
   z-index:4;
   will-change:transform;
   pointer-events:none;
@@ -569,7 +571,7 @@ body{
   .actions{justify-content:center}
 }
 
-@media (max-height:760px){
+@media (max-height:880px){
   :root{ --card-w:min(82vw, 320px); }
   .card-inner{padding-top:16px;padding-bottom:15px}
 }
