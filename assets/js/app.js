@@ -1,6 +1,11 @@
 /* ============================================================
    McKenna & Jared — Save the Date
-   Envelope reveal + video handoff to the native fullscreen player.
+
+   Three beats:
+     1. the stamped front  — tap turns the envelope over
+     2. the back           — tap breaks the seal, the flap opens and the
+                             card slides out sideways
+     3. the card           — tap the film for the native fullscreen player
    ============================================================ */
 (function () {
   'use strict';
@@ -9,6 +14,8 @@
 
   var stage    = $('stage');
   var scene    = $('scene');
+  var flipper  = $('flipper');
+  var faceFront= $('faceFront');
   var envelope = $('envelope');
   var flap     = $('flap');
   var lining   = document.querySelector('.env-lining');
@@ -21,15 +28,15 @@
   var playBtn  = $('playBtn');
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var opened  = false;
+  var touch   = window.matchMedia('(hover: none)').matches;
+  var VERB    = touch ? 'Tap' : 'Click';
+
+  var state = 'front';        // front -> flipping -> back -> opening -> done
   var flapBehind = false;
 
-  /* ── pick a rendition ──────────────────────────────────────
-     720p by default; drop to 540p only when the browser tells us
-     the connection is metered or slow. */
+  /* ── pick a rendition ────────────────────────────────────── */
   var HD = 'assets/video/save-the-date.mp4';
   var SD = 'assets/video/save-the-date-540.mp4';
-
   function chooseSource() {
     var c = navigator.connection || navigator.webkitConnection;
     if (c && (c.saveData || /^(slow-)?2g$/.test(c.effectiveType || ''))) return SD;
@@ -37,46 +44,69 @@
   }
   video.src = chooseSource();
 
-  /* ── envelope reveal ──────────────────────────────────────── */
+  cue.textContent = VERB + ' to turn over';
 
-  function openEnvelope() {
-    if (opened) return;
-    opened = true;
-    seal.setAttribute('disabled', '');
-    scene.classList.add('is-opening');
-    // the CSS "breathe" keyframes animate opacity too, and a running CSS
-    // animation outranks inline styles — so GSAP can't fade the cue until
-    // the keyframes are switched off
-    cue.style.animation = 'none';
+  /* ══ beat 1 — turn the envelope over ══ */
 
-    // They've engaged, so start fetching video metadata now. This matters on
-    // iOS: webkitEnterFullscreen is only accepted inside the user gesture AND
-    // once metadata exists, so having it ready by the time they tap play keeps
-    // the handoff on the synchronous path. load() rather than just setting
-    // preload, because Safari won't always act on the attribute change alone.
+  function flipOver() {
+    if (state !== 'front') return;
+    state = 'flipping';
+    setCue(VERB + ' to open');
+
+    // engagement: safe to start pulling video metadata now
     video.preload = 'metadata';
     try { video.load(); } catch (e) { /* non-fatal */ }
 
+    if (reduced || !window.gsap) { settleFlip(); return; }
+
+    gsap.timeline({ onComplete: settleFlip })
+      .to(flipper, { rotateY: 180, duration: 1.05, ease: 'power2.inOut' }, 0)
+      // a touch of lift makes the turn feel like a hand doing it
+      .to(flipper, { scale: 1.045, duration: 0.5,  ease: 'power2.out' }, 0)
+      .to(flipper, { scale: 1,     duration: 0.55, ease: 'power2.in'  }, 0.5);
+  }
+
+  /* Drop out of 3D once the turn is finished. The back face carries its own
+     rotateY(180); combined with the flipper's 180 that is a full turn, so
+     zeroing both together leaves the geometry identical while handing the
+     flap back a plain 2D context with ordinary z-index stacking. */
+  function settleFlip() {
+    if (window.gsap) gsap.set(flipper, { clearProps: 'transform' });
+    flipper.classList.add('is-flat');
+    faceFront.style.display = 'none';
+    state = 'back';
+    seatCard();
+  }
+
+  /* ══ beat 2 — break the seal, open, draw the card out sideways ══ */
+
+  function openEnvelope() {
+    if (state !== 'back') return;
+    state = 'opening';
+    seal.setAttribute('disabled', '');
+    // a running CSS animation outranks inline styles, so the keyframes have
+    // to be switched off before GSAP can fade the cue
+    cue.style.animation = 'none';
+
     if (reduced || !window.gsap) { finish(true); return; }
 
-    var eh = envelope.offsetHeight;
+    var ew = envelope.offsetWidth;
 
-    var tl = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: function () { finish(false); } });
-
-    tl.to(cue,  { opacity: 0, y: 6, duration: 0.3 }, 0)
+    gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: function () { finish(false); } })
+      .to(cue,  { opacity: 0, y: 6, duration: 0.3 }, 0)
       .to(seal, { scale: 0.68, opacity: 0, rotation: -16, duration: 0.45, ease: 'power2.in' }, 0)
 
-      // flap swings up and over the back of the envelope
+      // the script is printed on the flap; it would read mirrored once the
+      // flap swings past vertical, so it goes before that happens
+      .to('.eb-script', { opacity: 0, duration: 0.35, ease: 'power2.in' }, 0.2)
       .set(lining, { opacity: 1 }, 0.2)
       .to(flap, {
         rotateX: -180,
         duration: 0.95,
         ease: 'power2.inOut',
         onUpdate: function () {
-          // Once past vertical the flap belongs *behind* the envelope.
-          // Only write when it actually flips: assigning an inline style every
-          // frame invalidates style on each tick and can make the compositor
-          // re-sort layers needlessly.
+          // once past vertical the flap belongs behind the envelope; only
+          // write on the actual crossing, not every tick
           var behind = gsap.getProperty(flap, 'rotateX') < -90;
           if (behind !== flapBehind) {
             flapBehind = behind;
@@ -85,28 +115,22 @@
         }
       }, 0.2)
 
-      // card lifts far enough that its head clears the envelope's top edge
-      .to(cardSlot, { y: -eh * 0.46, duration: 0.8, ease: 'power2.out' }, 0.95);
+      // …and the card draws out to the side rather than upward
+      .to(cardSlot, { x: ew * 0.34, duration: 0.9, ease: 'power2.out' }, 0.95);
   }
 
-  /* The card is a good deal taller than the envelope, so at rest it gets
-     scaled down to sit wholly inside it — otherwise it pokes out of the top
-     before anything has been opened. The FLIP at the end grows it back to
-     full size, which is what sells the "unfolding" moment. */
+  /* the card sits scaled down inside the envelope so nothing pokes out */
   function seatCard() {
     if (!window.gsap || cardSlot.classList.contains('is-out')) return;
     var s = Math.min(0.9, (envelope.offsetHeight * 0.80) / card.offsetHeight);
     gsap.set(cardSlot, { xPercent: -50, x: 0, y: 0, scale: s, transformOrigin: '50% 100%' });
   }
 
-  /* Hand the card off from "inside the envelope" to its own centred
-     layout, using a FLIP so the size/position change is one motion
-     instead of a jump. */
+  /* ══ beat 3 — hand the card off to its own centred layout ══ */
+
   function finish(instant) {
     var first = card.getBoundingClientRect();
 
-    // lift the card out of the envelope's subtree so the envelope can be
-    // dismissed without taking the card with it
     stage.appendChild(cardSlot);
     cardSlot.classList.add('is-out');
     stage.classList.add('is-revealed');
@@ -116,10 +140,10 @@
       else cardSlot.style.transform = 'none';
       scene.style.display = 'none';
       revealContent(true);
+      state = 'done';
       return;
     }
 
-    // centre the now-absolute envelope on the spot it already occupies
     gsap.set(scene, { xPercent: -50, yPercent: -50 });
     gsap.set(cardSlot, { clearProps: 'transform' });
     var last = card.getBoundingClientRect();
@@ -132,7 +156,7 @@
       transformOrigin: '0 0'
     });
 
-    gsap.timeline()
+    gsap.timeline({ onComplete: function () { state = 'done'; } })
       .to(scene, {
         opacity: 0, y: 26, scale: 0.94, duration: 0.5, ease: 'power2.in',
         onComplete: function () { scene.style.display = 'none'; }
@@ -146,56 +170,64 @@
       .add(revealContent, 0.3);
   }
 
-  /* lower half of the card fills in as it lands */
   function revealContent(instant) {
-    var bits = card.querySelectorAll('.rule, .date, .film, .venue, .actions, .footnote');
+    var bits = card.querySelectorAll('.film, .venue, .actions, .footnote');
     if (instant === true || reduced || !window.gsap) {
-      gsap && gsap.set(bits, { opacity: 1, y: 0 });
+      if (window.gsap) gsap.set(bits, { opacity: 1, y: 0 });
       return;
     }
     gsap.fromTo(bits,
       { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.075, ease: 'power2.out' });
+      { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out' });
   }
 
-  /* hide those bits up front so the stagger has somewhere to come from */
   if (window.gsap && !reduced) {
-    gsap.set(card.querySelectorAll('.rule, .date, .film, .venue, .actions, .footnote'), { opacity: 0 });
+    gsap.set(card.querySelectorAll('.film, .venue, .actions, .footnote'), { opacity: 0 });
   }
 
-  // "Tap" reads wrong on a desktop with a mouse
-  if (!window.matchMedia('(hover: none)').matches) cue.textContent = 'Click to open';
+  function setCue(text) {
+    if (!window.gsap || reduced) { cue.textContent = text; return; }
+    gsap.to(cue, {
+      opacity: 0, duration: 0.25,
+      onComplete: function () {
+        cue.textContent = text;
+        gsap.to(cue, { opacity: 0.85, duration: 0.3 });
+      }
+    });
+  }
+
+  /* ── wiring ── */
 
   seatCard();
   window.addEventListener('resize', seatCard);
-  // late-arriving webfonts change the card's height, so re-seat afterwards
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(seatCard);
 
-  seal.addEventListener('click', openEnvelope);
-  envelope.addEventListener('click', function (e) {
-    if (!opened && !e.target.closest('.card')) openEnvelope();
+  flipper.addEventListener('click', function (e) {
+    if (state === 'front') { flipOver(); return; }
+    if (state === 'back' && !e.target.closest('.card')) openEnvelope();
+  });
+  seal.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (state === 'back') openEnvelope();
   });
 
   /* ── video: play, then hand off to the native fullscreen player ── */
 
   function goFullscreen(el) {
-    if (el.requestFullscreen)             return el.requestFullscreen();
-    if (el.webkitEnterFullscreen)         return el.webkitEnterFullscreen();   // iPhone
-    if (el.webkitRequestFullscreen)       return el.webkitRequestFullscreen();
+    if (el.requestFullscreen)              return el.requestFullscreen();
+    if (el.webkitEnterFullscreen)          return el.webkitEnterFullscreen();   // iPhone
+    if (el.webkitRequestFullscreen)        return el.webkitRequestFullscreen();
     if (el.webkitSupportsPresentationMode) return el.webkitSetPresentationMode('fullscreen');
     return null;
   }
 
   playBtn.addEventListener('click', function () {
     film.classList.add('is-playing');
-
     var p = video.play();
     if (p && p.catch) p.catch(function () { /* fullscreen still worth trying */ });
 
-    // iOS needs metadata before it will accept webkitEnterFullscreen
-    if (video.readyState >= 1) {
-      tryFullscreen();
-    } else {
+    if (video.readyState >= 1) tryFullscreen();
+    else {
       video.addEventListener('loadedmetadata', tryFullscreen, { once: true });
       video.load();
     }
@@ -208,7 +240,6 @@
     } catch (e) { /* stays inline */ }
   }
 
-  // coming back from fullscreen shouldn't leave a black box
   video.addEventListener('ended', function () {
     film.classList.remove('is-playing');
     video.currentTime = 0;

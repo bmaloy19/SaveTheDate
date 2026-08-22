@@ -12,18 +12,31 @@ Tapping the film hands off to the phone's native fullscreen video player.
 
 ---
 
+## The three beats
+
+1. **The stamped front.** A landscape envelope: the film shows through a vellum
+   window on the left, postmark and four botanical stamps on the right. Tapping
+   turns it over.
+2. **The back.** "Mark your calendars" on the flap, names along the pocket, a
+   green wax seal. Tapping breaks the seal — the flap opens and the card draws
+   out **sideways**.
+3. **The card.** A green oval cartouche (SAVE / *the* / DATE, names, date) over
+   the film, venue, and the two buttons.
+
 ## Design
 
-Palette and typography are matched to the couple's Appy Couple wedding site so the
-two read as one suite:
+Matched to the couple's **Greenvelope** save-the-date:
 
 | | |
 |---|---|
-| Display type | Bauer Bodoni on their site → **Bodoni Moda** (the closest free Bodoni revival) |
-| Body type | **Open Sans** Light (300), same as their site |
-| Sand | `#d7c2a3` — their heading colour |
-| Cream | `#efe8e0` / `#e8e0d7` |
-| Charcoal | `#454545` |
+| Display type | **Bodoni Moda** (closest free Bodoni revival) |
+| Body type | **Open Sans** Light (300) |
+| Green | `#8b9a56` — sampled from their Greenvelope theme |
+| Deep / soft green | `#6b7a3e` / `#a8b583` |
+| Vellum | `#f8f7ef` envelope, `#e4e8d5` page ground |
+
+The stamps and postmark are generated SVG (perforations punched with a mask),
+not images — they stay crisp at any size and cost nothing to download.
 
 Fonts are self-hosted (latin subset only, ~168 KB total) rather than pulled from
 Google Fonts — that removes a third-party connection from the critical path.
