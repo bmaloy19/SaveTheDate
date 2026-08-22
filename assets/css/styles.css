@@ -36,9 +36,12 @@
   --serif: 'Bodoni Moda', 'Didot', 'Bodoni MT', Georgia, serif;
   --sans:  'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --env-w: min(92vw, 390px);
-  --env-h: calc(var(--env-w) * 0.70);
   --card-w: min(88vw, 384px);
+  /* envelope is derived from the card so the "card fills 86% of the
+     envelope" proportion holds at every breakpoint — sizing them
+     independently let the ratio drift on short laptop viewports */
+  --env-w: min(92vw, calc(var(--card-w) * 1.16));
+  --env-h: calc(var(--env-w) * 0.70);
 
   --ease-out: cubic-bezier(.16,.84,.34,1);
 }
@@ -253,15 +256,28 @@ body{
 
 /* ─────────────────────────  card  ───────────────────────── */
 
+/* The card is far taller than the envelope. Rather than shrink it until it
+   fits — which left a stamp-sized card rattling around inside — it is sized
+   to the envelope's WIDTH like a real card and simply clipped at the
+   envelope's bottom edge. Open at the top so it can rise clear. */
+.card-clip{
+  position:absolute;
+  left:0;right:0;
+  top:-100vh;             /* generous headroom for the card to travel into */
+  bottom:0;               /* the clipping edge */
+  overflow:hidden;
+  z-index:4;              /* between back(1) and front(6) */
+  pointer-events:none;
+}
+
 .card-slot{
   position:absolute;
   left:50%;
-  bottom:10%;
+  bottom:0;               /* anchored to the envelope's bottom edge */
   width:var(--card-w);
-  /* conservative default; app.js measures and refines it on load */
-  transform:translateX(-50%) scale(.30);
+  /* parked below the clip until app.js measures and seats it */
+  transform:translateX(-50%) translateY(120%) scale(.9);
   transform-origin:50% 100%;
-  z-index:4;              /* between back(1) and front(6) */
   will-change:transform;
   pointer-events:none;    /* off until it's out of the envelope */
 }
@@ -527,7 +543,6 @@ body{
 
 @media (min-width:768px){
   :root{
-    --env-w:min(62vw, 460px);
     --card-w:min(52vw, 420px);
   }
   .actions{justify-content:center}
