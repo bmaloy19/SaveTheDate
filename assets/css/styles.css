@@ -100,8 +100,11 @@ body{
    source — it has no background-color, but this removes the ambiguity. */
 .grain{
   position:fixed;inset:6px 0;pointer-events:none;z-index:100;opacity:.5;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
-  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+  /* deliberately NOT mix-blend-mode: a blended full-viewport overlay forces
+     everything beneath it to re-composite on every animated frame, which
+     showed up as flicker on larger (desktop) viewports. Over a light ground
+     plain alpha looks the same. */
 }
 
 /* ─────────────────────────  stage  ───────────────────────── */
@@ -123,6 +126,13 @@ body{
 }
 
 /* ───────────────────────  envelope  ─────────────────────── */
+
+/* COMPOSITING NOTE: every panel below carries will-change:transform on
+   purpose. .card-slot and .env-flap need their own layers because they
+   animate; once any sibling is promoted, the un-promoted ones can be painted
+   out of z-index order by the compositor — the card flashed in front of the
+   envelope mid-animation. Promoting all of them keeps the ordering stable.
+   If you add a panel here, promote it too. */
 
 /* perspective lives on the envelope itself (not preserve-3d) so the flap
    still rotates in 3D while every panel keeps ordinary z-index stacking */
@@ -146,6 +156,7 @@ body{
 
 .env-back{
   position:absolute;inset:0;
+  will-change:transform;   /* see "compositing" note below */
   background:linear-gradient(168deg, #e0cdb1 0%, #cbb492 100%);
   border-radius:4px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.34);
@@ -155,6 +166,7 @@ body{
 /* the pale inner lining you see once the flap is up */
 .env-lining{
   position:absolute;left:0;right:0;top:0;
+  will-change:transform;
   height:62%;
   background:linear-gradient(180deg,#f3ece2 0%,#e7dccb 100%);
   clip-path:polygon(0 0, 100% 0, 50% 100%);
@@ -166,6 +178,7 @@ body{
 /* front pocket — overlaps the card so it reads as "tucked in" */
 .env-front{
   position:absolute;inset:0;
+  will-change:transform;
   background:linear-gradient(172deg, #e4d3ba 0%, #d2bc9b 60%, #c2a980 100%);
   border-radius:4px;
   z-index:6;
@@ -206,6 +219,7 @@ body{
   left:50%;top:58%;
   width:clamp(52px,14%,64px);aspect-ratio:1;
   transform:translate(-50%,-50%);
+  will-change:transform,opacity;
   z-index:9;
   border:0;padding:0;
   background:none;

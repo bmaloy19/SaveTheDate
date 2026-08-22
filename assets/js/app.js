@@ -22,6 +22,7 @@
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var opened  = false;
+  var flapBehind = false;
 
   /* ── pick a rendition ──────────────────────────────────────
      720p by default; drop to 540p only when the browser tells us
@@ -72,8 +73,15 @@
         duration: 0.95,
         ease: 'power2.inOut',
         onUpdate: function () {
-          // once past vertical the flap belongs *behind* the envelope
-          flap.style.zIndex = (gsap.getProperty(flap, 'rotateX') < -90) ? '0' : '8';
+          // Once past vertical the flap belongs *behind* the envelope.
+          // Only write when it actually flips: assigning an inline style every
+          // frame invalidates style on each tick and can make the compositor
+          // re-sort layers needlessly.
+          var behind = gsap.getProperty(flap, 'rotateX') < -90;
+          if (behind !== flapBehind) {
+            flapBehind = behind;
+            flap.style.zIndex = behind ? '0' : '8';
+          }
         }
       }, 0.2)
 
