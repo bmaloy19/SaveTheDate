@@ -18,10 +18,12 @@ Tapping the film hands off to the phone's native fullscreen video player.
    window on the left, postmark and four botanical stamps on the right. Tapping
    turns it over.
 2. **The back.** "Mark your calendars" on the flap, names along the pocket, a
-   green wax seal. Tapping breaks the seal — the flap opens and the card draws
-   out **sideways**.
-3. **The card.** A green oval cartouche (SAVE / *the* / DATE, names, date) over
-   the film, venue, and the two buttons.
+   green wax seal. Tapping breaks the seal — the flap opens and the card rises
+   out through the mouth, **lying on its side** the way a portrait card really
+   sits in a landscape envelope.
+3. **The card.** It stands upright as it settles, then presents portrait: a
+   green oval cartouche (SAVE / *the* / DATE, names, date) over the film,
+   venue, and the two buttons.
 
 ## Design
 

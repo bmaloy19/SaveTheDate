@@ -4,7 +4,7 @@
    Three beats:
      1. the stamped front  — tap turns the envelope over
      2. the back           — tap breaks the seal, the flap opens and the
-                             card slides out sideways
+                             card rises out lying on its side
      3. the card           — tap the film for the native fullscreen player
    ============================================================ */
 (function () {
@@ -79,7 +79,7 @@
     seatCard();
   }
 
-  /* ══ beat 2 — break the seal, open, draw the card out sideways ══ */
+  /* ══ beat 2 — break the seal, open, draw the card up and out ══ */
 
   function openEnvelope() {
     if (state !== 'back') return;
@@ -91,7 +91,7 @@
 
     if (reduced || !window.gsap) { finish(true); return; }
 
-    var ew = envelope.offsetWidth;
+    var eh = envelope.offsetHeight;
 
     gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: function () { finish(false); } })
       .to(cue,  { opacity: 0, y: 6, duration: 0.3 }, 0)
@@ -116,11 +116,10 @@
         }
       }, 0.2)
 
-      // …and the card draws out to the side rather than upward. Lying on its
-      // side it nearly fills the envelope, so the envelope drifts the other
-      // way to make room — on a phone there is otherwise nowhere to draw to.
-      .to(cardSlot, { x: ew * 0.34, duration: 0.9, ease: 'power2.out' }, 0.95)
-      .to(scene,    { x: -ew * 0.23, duration: 0.9, ease: 'power2.out' }, 0.95);
+      // …and the card rises out through the mouth the flap just opened. It
+      // stays lying on its side the whole way and only stands up once it has
+      // cleared the envelope, during the settle.
+      .to(cardSlot, { y: -eh * 0.64, duration: 0.9, ease: 'power2.out' }, 0.95);
   }
 
   /* The card lies on its side inside the landscape envelope, exactly as a
