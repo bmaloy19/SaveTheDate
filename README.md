@@ -86,6 +86,12 @@ No build step. It is static files; edit and push.
   so the flap still rotates in 3D while every panel keeps ordinary `z-index` stacking.
 - `prefers-reduced-motion` skips straight to the open card.
 - If GSAP fails to load, the page still opens — it just does so without animation.
+- **iOS toolbar tint.** Safari 26 dropped support for `<meta theme-color>`; it now
+  reads the `background-color` of `body`, or of a fixed element within 4px of the
+  top / 3px of the bottom (>=80% wide, >=3px tall). Gradients are ignored, so the
+  body needs a real `background-color` or the bars fall back to white. `.tint-top`
+  and `.tint-bottom` in `styles.css` give each bar the gradient's colour at its own
+  edge. The `theme-color` meta is kept for Android Chrome and pre-26 iOS.
 - `robots.txt` and a `noindex` meta keep it out of search results. It is reachable
   by anyone with the link, so treat the URL as the only gate.
 

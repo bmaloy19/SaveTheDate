@@ -47,11 +47,18 @@
 
 html,body{height:100%}
 
+/* fills the overscroll / safe areas behind the gradient */
+html{background-color:var(--cream)}
+
 body{
   font-family:var(--sans);
   font-weight:300;
   color:var(--ink);
-  background:
+  /* Safari 26 ignores <meta theme-color> and instead reads the
+     background-COLOR of the body (gradients are skipped entirely) to tint
+     the iOS toolbars. Without this solid base the bars fall back to white. */
+  background-color:var(--cream);
+  background-image:
     radial-gradient(120% 90% at 50% 8%, #f6f1ea 0%, var(--cream) 46%, var(--cream-2) 100%);
   min-height:100svh;
   overflow-x:hidden;
@@ -60,9 +67,39 @@ body{
   text-rendering:optimizeLegibility;
 }
 
-/* faint paper tooth over the whole page */
+/* ─────────────────  iOS toolbar tinting  ─────────────────
+   Safari 26 samples fixed/sticky elements sitting within 4px of the top or
+   3px of the bottom that are >=80% wide and >=3px tall, reading only their
+   background-color. These two strips let the top and bottom bars each pick
+   up the gradient's colour at their own edge rather than sharing one
+   averaged tone. Only ~4px of each is ever on screen, in a colour that
+   already matches the gradient there, so neither is visible.
+   body's background-color above stays the fallback for everything else. */
+.tint{
+  position:fixed;
+  left:0;
+  width:100%;
+  min-height:12px;
+  z-index:0;
+  pointer-events:none;
+  display:none;
+}
+.tint-top    {top:-8px;    background-color:#f5f0e9}
+.tint-bottom {bottom:-8px; background-color:var(--cream-2)}
+
+/* Safari only, phone-width only — other browsers don't need these and
+   shouldn't get stray fixed elements */
+@supports (-webkit-touch-callout:none){
+  @media (max-width:767px){
+    .tint{display:block}
+  }
+}
+
+/* faint paper tooth over the whole page.
+   Inset past the sampling thresholds so it is never mistaken for a tint
+   source — it has no background-color, but this removes the ambiguity. */
 .grain{
-  position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.5;
+  position:fixed;inset:6px 0;pointer-events:none;z-index:100;opacity:.5;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
   mix-blend-mode:multiply;
 }
