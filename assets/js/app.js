@@ -22,8 +22,6 @@
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var opened  = false;
-  var seatY   = 0;   // where the card rests inside the envelope
-  var seatScale = 1;
 
   /* ── pick a rendition ──────────────────────────────────────
      720p by default; drop to 540p only when the browser tells us
@@ -79,26 +77,18 @@
         }
       }, 0.2)
 
-      // card lifts clear of the envelope's mouth; its foot stays tucked
-      // below the bottom edge so it still reads as sitting in the pocket
-      .to(cardSlot, { y: seatY - eh * 0.45, duration: 0.85, ease: 'power2.out' }, 0.95);
+      // card lifts far enough that its head clears the envelope's top edge
+      .to(cardSlot, { y: -eh * 0.46, duration: 0.8, ease: 'power2.out' }, 0.95);
   }
 
-  /* Seat the card inside the envelope at a believable size.
-     It is scaled to the envelope's WIDTH — like a real card — and pushed down
-     until its top edge tucks just inside the envelope's mouth. Everything
-     hanging below is cut off by .card-clip, so the excess height never shows.
-     Sizing to height instead (the obvious move) leaves a stamp-sized card
-     floating in a large envelope, which is what this replaced. */
+  /* The card is a good deal taller than the envelope, so at rest it gets
+     scaled down to sit wholly inside it — otherwise it pokes out of the top
+     before anything has been opened. The FLIP at the end grows it back to
+     full size, which is what sells the "unfolding" moment. */
   function seatCard() {
     if (!window.gsap || cardSlot.classList.contains('is-out')) return;
-    var envH = envelope.offsetHeight;
-    var envW = envelope.offsetWidth;
-    seatScale = Math.min(1, (envW * 0.86) / card.offsetWidth);
-    seatY = card.offsetHeight * seatScale - envH + envH * 0.05;
-    gsap.set(cardSlot, {
-      xPercent: -50, x: 0, y: seatY, scale: seatScale, transformOrigin: '50% 100%'
-    });
+    var s = Math.min(0.9, (envelope.offsetHeight * 0.80) / card.offsetHeight);
+    gsap.set(cardSlot, { xPercent: -50, x: 0, y: 0, scale: s, transformOrigin: '50% 100%' });
   }
 
   /* Hand the card off from "inside the envelope" to its own centred
