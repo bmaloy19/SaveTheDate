@@ -25,6 +25,22 @@ Tapping the film hands off to the phone's native fullscreen video player.
    green oval cartouche (SAVE / *the* / DATE, names, date) over the film,
    venue, and the two buttons.
 
+## Run it locally
+
+```bash
+./serve.sh
+```
+
+That's it — it serves the folder and opens http://localhost:8000 for you.
+`python3` ships with macOS, so there is nothing to install. Pass a port if
+8000 is taken: `./serve.sh 9000`. Ctrl-C stops it.
+
+You must go through a server rather than double-clicking `index.html` — over
+`file://` the browser blocks the fonts and the video.
+
+To see it on your phone on the same wifi, find your Mac's IP with
+`ipconfig getifaddr en0` and open `http://<that-ip>:8000`.
+
 ## Design
 
 Matched to the couple's **Greenvelope** save-the-date:

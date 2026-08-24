@@ -140,12 +140,14 @@ body{
 .ef{
   position:absolute;inset:0;
   border-radius:4px;
-  background:linear-gradient(160deg, var(--vellum) 0%, var(--vellum-2) 100%);
+  background:linear-gradient(160deg, rgba(250,249,242,.72) 0%, rgba(238,236,223,.66) 100%);
+  backdrop-filter:blur(1.5px);
+  -webkit-backdrop-filter:blur(1.5px);
   box-shadow:
-    0 2px 5px rgba(80,88,50,.10),
-    0 14px 34px -14px rgba(80,88,50,.35),
-    inset 0 0 0 1px rgba(139,154,86,.28),
-    inset 0 1px 0 rgba(255,255,255,.7);
+    0 2px 5px rgba(80,88,50,.08),
+    0 14px 34px -14px rgba(80,88,50,.28),
+    inset 0 0 0 1px rgba(139,154,86,.30),
+    inset 0 1px 0 rgba(255,255,255,.55);
   display:flex;
   align-items:center;
   padding:5.5%;
@@ -229,13 +231,15 @@ body{
 .env-back{
   position:absolute;inset:0;
   will-change:transform;
-  background:linear-gradient(160deg, var(--vellum) 0%, var(--vellum-2) 100%);
+  background:linear-gradient(160deg, rgba(250,249,242,.62) 0%, rgba(238,236,223,.56) 100%);
+  backdrop-filter:blur(1.5px);
+  -webkit-backdrop-filter:blur(1.5px);
   border-radius:4px;
   box-shadow:
-    0 2px 5px rgba(80,88,50,.10),
-    0 14px 34px -14px rgba(80,88,50,.35),
-    inset 0 0 0 1px rgba(139,154,86,.28),
-    inset 0 1px 0 rgba(255,255,255,.65);
+    0 2px 5px rgba(80,88,50,.08),
+    0 14px 34px -14px rgba(80,88,50,.28),
+    inset 0 0 0 1px rgba(139,154,86,.30),
+    inset 0 1px 0 rgba(255,255,255,.5);
   z-index:1;
   overflow:hidden;
 }
@@ -266,7 +270,7 @@ body{
   position:absolute;left:0;right:0;top:0;
   height:62%;
   will-change:transform;
-  background:linear-gradient(180deg,#fbfaf3 0%,#efedde 100%);
+  background:linear-gradient(180deg,rgba(251,250,243,.66) 0%,rgba(239,237,222,.6) 100%);
   clip-path:polygon(0 0, 100% 0, 50% 100%);
   border-radius:4px 4px 0 0;
   z-index:2;
@@ -276,7 +280,9 @@ body{
 .env-front{
   position:absolute;inset:0;
   will-change:transform;
-  background:linear-gradient(172deg, #f9f8f1 0%, #f0eee1 60%, #e4e2d2 100%);
+  background:linear-gradient(172deg, rgba(249,248,241,.66) 0%, rgba(240,238,225,.62) 60%, rgba(228,226,210,.66) 100%);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
   border-radius:4px;
   z-index:6;
   clip-path:polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
@@ -285,15 +291,15 @@ body{
 .env-front::before{
   content:'';position:absolute;inset:0;
   background:
-    linear-gradient(to bottom right, transparent calc(50% - .5px), rgba(139,154,86,.16) 50%, transparent calc(50% + .5px)),
-    linear-gradient(to bottom left,  transparent calc(50% - .5px), rgba(139,154,86,.16) 50%, transparent calc(50% + .5px));
+    linear-gradient(to bottom right, transparent calc(50% - .5px), rgba(139,154,86,.30) 50%, transparent calc(50% + .5px)),
+    linear-gradient(to bottom left,  transparent calc(50% - .5px), rgba(139,154,86,.30) 50%, transparent calc(50% + .5px));
   clip-path:polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
 }
 
 .env-flap{
   position:absolute;left:0;right:0;top:0;
   height:62%;
-  background:linear-gradient(178deg, #faf9f2 0%, #eeecdd 90%);
+  background:linear-gradient(178deg, rgba(250,249,242,.72) 0%, rgba(238,236,221,.66) 90%);
   clip-path:polygon(0 0, 100% 0, 50% 100%);
   transform-origin:top center;
   transform:rotateX(0deg);
@@ -407,30 +413,26 @@ body{
 }
 
 /* the oval cartouche */
-.oval{
+/* the type sits directly on the paper — no filled cartouche behind it */
+.hero{
   position:relative;
   width:100%;
-  aspect-ratio:0.88;
-  border-radius:50%;
-  background:radial-gradient(72% 72% at 42% 30%, #96a561 0%, var(--green) 48%, #7c8a4b 100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  margin-bottom:clamp(14px,3.6vw,18px);
-  box-shadow:inset 0 1px 3px rgba(255,255,255,.18);
+  padding:clamp(10px,2.6vw,16px) 0 clamp(12px,3vw,17px);
+  margin-bottom:clamp(13px,3.4vw,17px);
 }
-.oval::before{ /* thin inset rule, as on their card */
-  content:'';position:absolute;inset:7%;
-  border:1px solid rgba(253,252,247,.42);
-  border-radius:50%;
-  pointer-events:none;
+/* a hairline rule top and bottom, so the block still reads as a masthead */
+.hero::before,.hero::after{
+  content:'';
+  position:absolute;left:22%;right:22%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(139,154,86,.55),transparent);
 }
+.hero::before{top:0}
+.hero::after{bottom:0}
 
 .std{
   font-family:var(--serif);
   font-weight:400;
-  color:#fdfcf7;
+  color:var(--green);
   line-height:1;
   display:flex;
   flex-direction:column;
@@ -447,23 +449,24 @@ body{
   font-size:clamp(17px,4.7vw,22px);
   letter-spacing:.02em;
   margin:.06em 0 .04em;
-  opacity:.94;
+  opacity:.9;
 }
 
-.oval .names{
+.hero .names{
   font-family:var(--serif);
   font-style:italic;
   font-size:clamp(11px,3vw,13.5px);
   letter-spacing:.05em;
-  color:rgba(253,252,247,.95);
-  margin-top:clamp(13px,3.4vw,17px);
+  color:var(--green-deep);
+  margin-top:clamp(11px,2.8vw,14px);
 }
-.oval .date{
+.hero .date{
   font-family:var(--serif);
   font-style:italic;
   font-size:clamp(10.5px,2.8vw,12.5px);
   letter-spacing:.05em;
-  color:rgba(253,252,247,.82);
+  color:var(--green-deep);
+  opacity:.82;
   margin-top:4px;
 }
 
@@ -571,7 +574,9 @@ body{
   .actions{justify-content:center}
 }
 
-@media (max-height:880px){
+/* the card lost ~180px when the oval came out, so this only needs to fire
+   on genuinely short viewports now */
+@media (max-height:700px){
   :root{ --card-w:min(82vw, 320px); }
   .card-inner{padding-top:16px;padding-bottom:15px}
 }
