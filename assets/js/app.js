@@ -33,6 +33,7 @@
 
   var state = 'front';        // front -> flipping -> back -> opening -> done
   var flapBehind = false;
+  var showingBack = false;
   var seatScale  = 1;
 
   /* ── pick a rendition ────────────────────────────────────── */
@@ -61,7 +62,22 @@
     if (reduced || !window.gsap) { settleFlip(); return; }
 
     gsap.timeline({ onComplete: settleFlip })
-      .to(flipper, { rotateY: 180, duration: 1.05, ease: 'power2.inOut' }, 0)
+      .to(flipper, {
+        rotateY: 180,
+        duration: 1.05,
+        ease: 'power2.inOut',
+        onUpdate: function () {
+          // past vertical the front is facing away, so the back takes over.
+          // backface-visibility can't be relied on to do this — a face with a
+          // composited child stops being culled — so the swap is written out.
+          // Same shape as the flap's crossing below: only on the crossing.
+          var back = gsap.getProperty(flipper, 'rotateY') >= 90;
+          if (back !== showingBack) {
+            showingBack = back;
+            flipper.classList.toggle('show-back', back);
+          }
+        }
+      }, 0)
       // a touch of lift makes the turn feel like a hand doing it
       .to(flipper, { scale: 1.045, duration: 0.5,  ease: 'power2.out' }, 0)
       .to(flipper, { scale: 1,     duration: 0.55, ease: 'power2.in'  }, 0.5);
@@ -73,6 +89,8 @@
      flap back a plain 2D context with ordinary z-index stacking. */
   function settleFlip() {
     if (window.gsap) gsap.set(flipper, { clearProps: 'transform' });
+    showingBack = true;
+    flipper.classList.add('show-back');
     flipper.classList.add('is-flat');
     faceFront.style.display = 'none';
     state = 'back';

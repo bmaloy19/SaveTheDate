@@ -120,6 +120,17 @@ body{
 }
 .face-back{transform:rotateY(180deg)}
 
+/* Backface culling on its own is not enough here. Both faces hold composited
+   children (backdrop-filter, will-change), and once a face is promoted to its
+   own layer WebKit stops culling it — the stamped front stays painted over the
+   back through the whole turn, and the back only appears when the transform is
+   cleared at the end. So the swap is made explicit: app.js flips .show-back as
+   rotateY crosses 90deg, where the envelope is edge-on and the change cannot be
+   seen. Hidden two ways because a promoted layer may honour only one of them.
+   With no JS at all the front still shows, which is the right resting state. */
+.flipper:not(.show-back) .face-back{visibility:hidden;opacity:0}
+.flipper.show-back        .face-front{visibility:hidden;opacity:0}
+
 /* once the turn-over is done JS flattens everything back to plain 2D, so the
    flap can use its own perspective and ordinary z-index stacking */
 .flipper.is-flat{transform-style:flat}
